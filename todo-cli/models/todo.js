@@ -1,80 +1,101 @@
-/* eslint-disable no-unused-vars */
-"use strict";
-const { Model } = require("sequelize");
-const { Sequelize } = require("sequelize");
-const { Op } = Sequelize;
-
+'use strict';
+const { Model, Op } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
     static async addTask(params) {
       return await Todo.create(params);
     }
     static async showList() {
-      console.log("My Todo list \n");
+      console.log('My Todo list \n');
 
-      console.log("Overdue");
-      const overdueItems = await Todo.overdue();
-      overdueItems.forEach((item) => console.log(item.displayableString()));
-      console.log();
+      console.log('Overdue');
+      // FILL IN HERE
+      console.log(
+        (await Todo.overdue())
+          .map((todo) => {
+            return todo.displayableString();
+          })
+          .join('\n')
+      );
 
-      console.log("Due Today");
-      const dueTodayItems = await Todo.dueToday();
-      dueTodayItems.forEach((item) => console.log(item.displayableString()));
-      console.log();
+      console.log('\n');
 
-      console.log("Due Later");
-      const dueLaterItems = await Todo.dueLater();
-      dueLaterItems.forEach((item) => console.log(item.displayableString()));
+      console.log('Due Today');
+      // FILL IN HERE
+      console.log(
+        (await Todo.dueToday())
+          .map((todo) => {
+            return todo.displayableString();
+          })
+          .join('\n')
+      );
+      console.log('\n');
+
+      console.log('Due Later');
+      // FILL IN HERE`
+      console.log(
+        (await Todo.dueLater())
+          .map((todo) => {
+            return todo.displayableString();
+          })
+          .join('\n')
+      );
     }
 
     static async overdue() {
+      // FILL IN HERE TO RETURN OVERDUE ITEMS
       return await Todo.findAll({
         where: {
-          dueDate: {
-            [Op.lt]: new Date(),
-          },
+          dueDate: { [Op.lt]: new Date().toLocaleDateString('en-CA') },
         },
       });
     }
 
     static async dueToday() {
+      // FILL IN HERE TO RETURN ITEMS DUE tODAY
       return await Todo.findAll({
         where: {
-          dueDate: {
-            [Op.eq]: new Date(),
-          },
+          dueDate: { [Op.eq]: new Date().toLocaleDateString('en-CA') },
         },
       });
     }
 
     static async dueLater() {
+      // FILL IN HERE TO RETURN ITEMS DUE LATER
       return await Todo.findAll({
         where: {
-          dueDate: {
-            [Op.gt]: new Date(),
-          },
+          dueDate: { [Op.gt]: new Date().toLocaleDateString('en-CA') },
         },
       });
     }
 
     static async markAsComplete(id) {
-      const todo = await Todo.findByPk(id);
-      if (todo) {
-        todo.completed = true;
-        console.log(`Todo with ID ${id} marked as complete.`);
-        await todo.save();
-      } else {
-        throw new Error(`Todo with id ${id} not found`);
-      }
+      // FILL IN HERE TO MARK AN ITEM AS COMPLETE
+      await Todo.update(
+        { completed: true },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
     }
 
     displayableString() {
-      let checkbox = this.completed ? "[x]" : "[ ]";
+      let checkbox = this.completed ? '[x]' : '[ ]';
 
-      if (this.dueDate === new Date().toLocaleDateString("en-CA")) {
+      let dateToday = new Date().toISOString().split('T')[0];
+
+      if (this.dueDate === dateToday) {
         return `${this.id}. ${checkbox} ${this.title}`;
+      } else {
+        return `${this.id}. ${checkbox} ${this.title} ${this.dueDate}`;
       }
-      return `${this.id}. ${checkbox} ${this.title} ${this.dueDate}`;
     }
   }
   Todo.init(
@@ -85,8 +106,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Todo",
-    },
+      modelName: 'Todo',
+    }
   );
   return Todo;
-};// Your JavaScript code 
+};
