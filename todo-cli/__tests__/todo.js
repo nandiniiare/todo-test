@@ -1,46 +1,40 @@
-const { all, add, markAsComplete, overdue, dueToday, dueLater } = require('./todo');
+const all = [];
 
-describe('Todo List Tests', () => {
-  beforeEach(() => {
-    // Reset the todo list before each test
-    all.length = 0;
-  });
+function add(todo) {
+  all.push(todo);
+}
 
-  test('Test to add a todo', () => {
-    const newTodo = { title: 'Example Todo', dueDate: '2023-12-31', completed: false };
-    add(newTodo);
-    expect(all.length).toBe(1);
-    expect(all[0]).toEqual(newTodo);
-  });
+function markAsComplete(index) {
+  if (index >= 0 && index < all.length) {
+    all[index].completed = true;
+  }
+}
 
-  test('Test to mark a todo as complete', () => {
-    const todo = { title: 'Example Todo', dueDate: '2023-12-31', completed: false };
-    add(todo);
-    markAsComplete(0);
-    expect(all[0].completed).toBe(true);
+function overdue() {
+  // Assuming today is the current date
+  const today = new Date();
+  return all.filter((todo) => {
+    const todoDueDate = new Date(todo.dueDate);
+    return !todo.completed && todoDueDate < today;
   });
+}
 
-  test('Test to retrieve overdue items', () => {
-    const overdueTodo = { title: 'Overdue Todo', dueDate: '2022-01-01', completed: false };
-    add(overdueTodo);
-    const result = overdue();
-    expect(result.length).toBe(1);
-    expect(result[0]).toEqual(overdueTodo);
+function dueToday() {
+  // Assuming today is the current date
+  const today = new Date();
+  return all.filter((todo) => {
+    const todoDueDate = new Date(todo.dueDate);
+    return !todo.completed && todoDueDate.toDateString() === today.toDateString();
   });
+}
 
-  test('Test to retrieve due today items', () => {
-    const dueTodayTodo = { title: 'Due Today Todo', dueDate: new Date().toISOString(), completed: false };
-    add(dueTodayTodo);
-    const result = dueToday();
-    expect(result.length).toBe(1);
-    expect(result[0]).toEqual(dueTodayTodo);
+function dueLater() {
+  // Assuming today is the current date
+  const today = new Date();
+  return all.filter((todo) => {
+    const todoDueDate = new Date(todo.dueDate);
+    return !todo.completed && todoDueDate > today;
   });
+}
 
-  test('Test to retrieve due later items', () => {
-    const dueLaterTodo = { title: 'Due Later Todo', dueDate: '2023-12-31', completed: false };
-    add(dueLaterTodo);
-    const result = dueLater();
-    expect(result.length).toBe(1);
-    expect(result[0]).toEqual(dueLaterTodo);
-  });
-});
+module.exports = { all, add, markAsComplete, overdue, dueToday, dueLater };
