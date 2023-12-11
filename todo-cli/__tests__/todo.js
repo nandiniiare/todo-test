@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const db = require("../models");
+const db = require("../../models");
 
 const getJSDate = (days) => {
   if (!Number.isInteger(days)) {
